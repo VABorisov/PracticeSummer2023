@@ -205,6 +205,8 @@ if __name__ == "__main__":
     plt.show()
     """
     
+    
+    
     model_conv = torchvision.models.resnet18(weights='IMAGENET1K_V1')
     for param in model_conv.parameters():
         param.requires_grad = False
@@ -227,6 +229,36 @@ if __name__ == "__main__":
     model_conv = train_model(model_conv, criterion, optimizer_conv,
                          exp_lr_scheduler, num_epochs=25)
     visualize_model(model_conv)
+
+    #plt.ioff()
+    #plt.show()
+    
+    
+    
+    def visualize_model_predictions(model,img_path):
+        was_training = model.training
+        model.eval()
+
+        img = Image.open(img_path)
+        img = data_transforms['val'](img)
+        img = img.unsqueeze(0)
+        img = img.to(device)
+
+        with torch.no_grad():
+            outputs = model(img)
+            _, preds = torch.max(outputs, 1)
+
+            ax = plt.subplot(2,2,1)
+            ax.axis('off')
+            ax.set_title(f'Predicted: {class_names[preds[0]]}')
+            imshow(img.cpu().data[0])
+
+            model.train(mode=was_training)
+    
+    visualize_model_predictions(
+        model_conv,
+        img_path=r'E:\datasets\hymenoptera_data\val\bees\72100438_73de9f17af.jpg'
+    )
 
     plt.ioff()
     plt.show()
